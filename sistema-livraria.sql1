@@ -25,3 +25,6 @@ INSERT INTO Compras (ClienteID, NomeLivro) VALUES
 (1, 'The Pragmatic Programmer'),
 (2, 'Design Patterns'),
 (3, 'SQL Performance Explained');
+ 
+SELECT * FROM Clientes; 
+SELECT * FROM Compras; 
