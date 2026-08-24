@@ -1,0 +1,27 @@
+-- Criação do banco de dados adaptado para SQLite Online
+-- Tabela Clientes
+CREATE TABLE Clientes (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    nomeCliente VARCHAR(100) NOT NULL,
+    emailCliente VARCHAR(100) NOT NULL
+);
+
+-- Tabela Compras
+CREATE TABLE Compras (
+    CompraID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ClienteID INTEGER NOT NULL,
+    NomeLivro VARCHAR(150) NOT NULL,
+    FOREIGN KEY (ClienteID) REFERENCES Clientes(ID)
+);
+
+-- Exemplos de dados para teste
+INSERT INTO Clientes (nomeCliente, emailCliente) VALUES
+('João Silva', 'joao@email.com'),
+('Maria Santos', 'maria@email.com'),
+('Pedro Oliveira', 'pedro@email.com');
+
+INSERT INTO Compras (ClienteID, NomeLivro) VALUES
+(1, 'Clean Code'),
+(1, 'The Pragmatic Programmer'),
+(2, 'Design Patterns'),
+(3, 'SQL Performance Explained');
