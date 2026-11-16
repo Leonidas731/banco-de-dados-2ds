@@ -127,3 +127,170 @@ janela.mainloop()
 
 # Fechar conexão ao encerrar
 conn.close()
+
+
+---------------------------------------------------------------------------------------------
+
+import tkinter as tk
+from tkinter import messagebox, ttk
+import sqlite3
+
+# ==========================
+# Banco de Dados SQLite
+# ==========================
+
+conn = sqlite3.connect("clientes.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS clientes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL,
+    telefone TEXT NOT NULL
+)
+""")
+
+conn.commit()
+
+# ==========================
+# Funções
+# ==========================
+
+def salvar_cliente():
+    nome = entry_nome.get().strip()
+    email = entry_email.get().strip()
+    telefone = entry_telefone.get().strip()
+
+    # Validação
+    if not nome or not email or not telefone:
+        messagebox.showwarning(
+            "Atenção",
+            "Preencha todos os campos."
+        )
+        return
+
+    try:
+        cursor.execute(
+            "INSERT INTO clientes (nome, email, telefone) VALUES (?, ?, ?)",
+            (nome, email, telefone)
+        )
+        conn.commit()
+
+        messagebox.showinfo(
+            "Sucesso",
+            "Cliente cadastrado com sucesso!"
+        )
+
+        limpar_formulario()
+
+    except Exception as erro:
+        messagebox.showerror(
+            "Erro",
+            f"Erro ao salvar cliente:\n{erro}"
+        )
+
+
+def limpar_formulario():
+    entry_nome.delete(0, tk.END)
+    entry_email.delete(0, tk.END)
+    entry_telefone.delete(0, tk.END)
+
+
+def visualizar_clientes():
+    janela_clientes = tk.Toplevel()
+    janela_clientes.title("Clientes Cadastrados")
+    janela_clientes.geometry("700x300")
+
+    tabela = ttk.Treeview(
+        janela_clientes,
+        columns=("ID", "Nome", "Email", "Telefone"),
+        show="headings"
+    )
+
+    tabela.heading("ID", text="ID")
+    tabela.heading("Nome", text="Nome")
+    tabela.heading("Email", text="E-mail")
+    tabela.heading("Telefone", text="Telefone")
+
+    tabela.column("ID", width=50, anchor="center")
+    tabela.column("Nome", width=180)
+    tabela.column("Email", width=250)
+    tabela.column("Telefone", width=150)
+
+    tabela.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    cursor.execute("SELECT * FROM clientes")
+    registros = cursor.fetchall()
+
+    for cliente in registros:
+        tabela.insert("", tk.END, values=cliente)
+
+
+# ==========================
+# Interface Gráfica
+# ==========================
+
+janela = tk.Tk()
+janela.title("Cadastro de Clientes")
+janela.geometry("450x300")
+janela.resizable(False, False)
+
+titulo = tk.Label(
+    janela,
+    text="Cadastro de Clientes",
+    font=("Arial", 14, "bold")
+)
+titulo.pack(pady=10)
+
+# Nome
+tk.Label(janela, text="Nome:").pack()
+entry_nome = tk.Entry(janela, width=40)
+entry_nome.pack(pady=5)
+
+# E-mail
+tk.Label(janela, text="E-mail:").pack()
+entry_email = tk.Entry(janela, width=40)
+entry_email.pack(pady=5)
+
+# Telefone
+tk.Label(janela, text="Telefone:").pack()
+entry_telefone = tk.Entry(janela, width=40)
+entry_telefone.pack(pady=5)
+
+# Frame dos botões
+frame_botoes = tk.Frame(janela)
+frame_botoes.pack(pady=15)
+
+btn_salvar = tk.Button(
+    frame_botoes,
+    text="Salvar",
+    width=15,
+    command=salvar_cliente,
+    bg="green",
+    fg="white"
+)
+btn_salvar.grid(row=0, column=0, padx=5)
+
+btn_limpar = tk.Button(
+    frame_botoes,
+    text="Limpar",
+    width=15,
+    command=limpar_formulario,
+    bg="orange"
+)
+btn_limpar.grid(row=0, column=1, padx=5)
+
+btn_visualizar = tk.Button(
+    frame_botoes,
+    text="Visualizar Clientes",
+    width=18,
+    command=visualizar_clientes,
+    bg="blue",
+    fg="white"
+)
+btn_visualizar.grid(row=0, column=2, padx=5)
+
+janela.mainloop()
+
+conn.close()
